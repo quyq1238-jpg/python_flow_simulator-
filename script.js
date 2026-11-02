@@ -38,7 +38,60 @@ print("Giai thừa n! =", gt)`,
 a = float(input("Nhập số thứ nhất a: "))
 b = float(input("Nhập số thứ hai b: "))
 tb = (a + b) / 2
-print("Trung bình cộng là:", tb)`
+print("Trung bình cộng là:", tb)`,
+
+  preset_list: `# Ví dụ 6: Kiểu dữ liệu danh sách (List)
+ds = [5, 10, 15, 20]
+print("Danh sách ban đầu:", ds)
+# Truy cập phần tử qua chỉ số
+p1 = ds[0]
+p2 = ds[1]
+print("Phần tử thứ nhất:", p1)
+print("Phần tử thứ hai:", p2)
+# Tính toán
+tong = p1 + p2
+print("Tổng 2 phần tử đầu:", tong)`,
+
+  preset_string: `# Ví dụ 7: Xâu kí tự (String)
+s1 = "Hello"
+s2 = "Python"
+# Nối xâu
+s = s1 + " " + s2
+print("Xâu kết quả sau khi nối:", s)
+# Tính chiều dài xâu
+chieudai = len(s)
+print("Chiều dài xâu là:", chieudai)`,
+
+  preset_func: `# Ví dụ 8: Cấu trúc Hàm trong Python
+# Định nghĩa hàm
+def tinh_tong(a, b):
+    kq = a + b
+    return kq
+
+# Chương trình chính (mô phỏng)
+x = float(input("Nhập số x: "))
+y = float(input("Nhập số y: "))
+# Gọi hàm để tính
+tong = x + y
+print("Tổng hai số là:", tong)`,
+
+  preset_scope: `# Ví dụ 9: Phạm vi của biến (Variable Scope)
+# Khai báo biến toàn cục
+toan_cuc = 100
+print("Biến toàn cục =", toan_cuc)
+
+# Định nghĩa hàm có biến cục bộ
+def vi_du_pham_vi():
+    cuc_bo = 50
+    print("Biến cục bộ trong hàm =", cuc_bo)
+
+# Chương trình chính (mô phỏng gọi hàm)
+print("--- Đang gọi hàm ---")
+cuc_bo = 50
+print("Trong hàm - Cục bộ =", cuc_bo)
+print("Trong hàm - Toàn cục =", toan_cuc)
+print("--- Kết thúc gọi hàm ---")
+print("Ngoài hàm - Toàn cục =", toan_cuc)`
 };
 
 /* =========================================================================
@@ -141,8 +194,17 @@ class FlowchartLayoutEngine {
     this.edges = [];
   }
 
-  createNode(type, label, lineNum, expr = '') {
+createNode(type, label, lineNum, expr = '') {
     const id = 'node_' + (++this.nodeCounter);
+    
+    // Tính toán chiều rộng động dựa trên độ dài của text (ước tính 7px/ký tự + 40px padding)
+    let dynamicWidth = Math.max(130, label.length * 7 + 40);
+    if (type === 'decision') {
+      dynamicWidth = Math.max(160, label.length * 7 + 80); // Hình thoi cần padding lớn hơn
+    } else if (type === 'merge') {
+      dynamicWidth = 14;
+    }
+
     const node = {
       id: id,
       type: type, // 'start', 'end', 'process', 'io', 'decision', 'merge'
@@ -151,7 +213,7 @@ class FlowchartLayoutEngine {
       expr: expr,
       x: 320,
       y: 0,
-      w: type === 'decision' ? 140 : (type === 'merge' ? 14 : 130),
+      w: dynamicWidth,
       h: type === 'decision' ? 70 : (type === 'merge' ? 14 : 46)
     };
     this.nodes.push(node);
@@ -186,7 +248,7 @@ class FlowchartLayoutEngine {
       stmts.forEach(stmt => {
         if (stmt.type === 'simple') {
           let shapeType = 'process';
-          if (stmt.text.includes('input(') || stmt.text.startsWith('print(')) {
+          if (stmt.text.includes('input(') || stmt.text.includes('print(')) {
             shapeType = 'io';
           }
           const node = this.createNode(shapeType, stmt.text, stmt.lineNum, stmt.text);
@@ -226,7 +288,7 @@ class FlowchartLayoutEngine {
       let last = decNode;
       ifStmt.thenBody.forEach((s, idx) => {
         if (s.type === 'simple') {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(decNode, n, 'Đúng', 'branch_left');
           else this.addEdge(last, n);
@@ -250,7 +312,7 @@ class FlowchartLayoutEngine {
 
         let elifTrueLast = elifDecNode;
         eb.body.forEach((s, idx) => {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(elifDecNode, n, 'Đúng', 'branch_left');
           else this.addEdge(elifTrueLast, n);
@@ -263,7 +325,7 @@ class FlowchartLayoutEngine {
       if (ifStmt.elseBody && ifStmt.elseBody.length > 0) {
         let elseLast = lastDecision;
         ifStmt.elseBody.forEach((s, idx) => {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(lastDecision, n, 'Sai', 'branch_right');
           else this.addEdge(elseLast, n);
@@ -278,7 +340,7 @@ class FlowchartLayoutEngine {
       let last = decNode;
       ifStmt.elseBody.forEach((s, idx) => {
         if (s.type === 'simple') {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(decNode, n, 'Sai', 'branch_right');
           else this.addEdge(last, n);
@@ -308,7 +370,7 @@ class FlowchartLayoutEngine {
       let last = decNode;
       whileStmt.body.forEach((s, idx) => {
         if (s.type === 'simple') {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(decNode, n, 'Đúng', 'straight_down');
           else this.addEdge(last, n);
@@ -341,7 +403,7 @@ class FlowchartLayoutEngine {
       let last = decNode;
       forStmt.body.forEach((s, idx) => {
         if (s.type === 'simple') {
-          const nType = (s.text.includes('input(') || s.text.startsWith('print(')) ? 'io' : 'process';
+          const nType = (s.text.includes('input(') || s.text.includes('print(')) ? 'io' : 'process';
           const n = this.createNode(nType, s.text, s.lineNum, s.text);
           if (idx === 0) this.addEdge(decNode, n, 'Đúng', 'straight_down');
           else this.addEdge(last, n);
@@ -485,7 +547,7 @@ class SVGFlowchartRenderer {
       shape.setAttribute('y', y);
       shape.setAttribute('width', w);
       shape.setAttribute('height', h);
-      shape.setAttribute('rx', '6');
+      shape.setAttribute('rx', '0'); 
       shape.setAttribute('fill', '#1e293b');
       shape.setAttribute('stroke', '#94a3b8');
       shape.setAttribute('stroke-width', '2.5');
@@ -504,9 +566,8 @@ class SVGFlowchartRenderer {
       text.setAttribute('font-weight', '500');
       text.setAttribute('font-family', 'JetBrains Mono, monospace');
 
-      let labelText = node.label;
-      if (labelText.length > 20) labelText = labelText.substring(0, 18) + '..';
-      text.textContent = labelText;
+      // Gán toàn bộ text gốc, không dùng substring để cắt nữa
+      text.textContent = node.label;
 
       g.appendChild(text);
     }
@@ -585,7 +646,8 @@ class PythonInterpreter {
         .replace(/\bor\b/g, '||')
         .replace(/\bnot\b/g, '!')
         .replace(/True/g, 'true')
-        .replace(/False/g, 'false');
+        .replace(/False/g, 'false')
+        .replace(/\blen\((.*?)\)/g, '$1.length'); // Hỗ trợ tính chiều dài của string và list
 
       const keys = Object.keys(scope);
       const vals = Object.values(scope);
@@ -659,7 +721,8 @@ class PythonInterpreter {
           } else if (text.includes('=')) {
             const parts = text.split('=');
             const varName = parts[0].trim();
-            const expr = parts[1].trim();
+            // Lấy toàn bộ phần sau dấu = cho phép gán string an toàn
+            const expr = parts.slice(1).join('=').trim(); 
             const result = this.evalExpr(expr, this.variables);
             this.variables[varName] = result;
             addStep(node, stmt.lineNum, `Tính toán & gán giá trị: <b>${varName} = ${result}</b>`);
@@ -741,7 +804,6 @@ class PythonInterpreter {
  * 6. APPLICATION CONTROLLER & INTERACTIVE UI BINDINGS
  * ========================================================================= */
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements
   const presetSelect = document.getElementById('presetSelect');
   const codeInput = document.getElementById('pythonCodeInput');
   const lineNumbers = document.getElementById('lineNumbers');
@@ -764,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pasteFallbackCode = document.getElementById('pasteFallbackCode');
   const btnSyncPastedCode = document.getElementById('btnSyncPastedCode');
 
+  const svgContainer = document.getElementById('svgContainer');
   const flowchartSvg = document.getElementById('flowchartSvg');
   const svgViewport = document.getElementById('svgViewport');
 
@@ -788,26 +851,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const onlinePythonIframe = document.getElementById('onlinePythonIframe');
   const flowchartPanel = document.getElementById('flowchartPanel');
 
-  // Engine Instances
   const layoutEngine = new FlowchartLayoutEngine();
   const svgRenderer = new SVGFlowchartRenderer(flowchartSvg, svgViewport);
   const interpreter = new PythonInterpreter();
 
-  // State Variables
   let currentAST = null;
   let currentGraph = null;
   let traceSteps = [];
   let currentStepIdx = -1;
   let autoPlayInterval = null;
-  let zoomLevel = 1.0;
   let pendingInputResolver = null;
 
-  // Input Caching System State Variables
-  let savedInputs = [];        // Lưu mảng các giá trị người dùng đã nhập
-  let inputIndex = 0;           // Trỏ vị trí lấy dữ liệu cũ khi tái sử dụng
-  let isReusingInputs = false;  // Cờ đánh dấu có dùng dữ liệu cũ hay không
+  let savedInputs = [];        
+  let inputIndex = 0;           
+  let isReusingInputs = false;  
 
-  // Initial Preset Setup
+  let zoomLevel = 1.0;
+  let panX = 0;
+  let panY = 0;
+  let isDragging = false;
+  let startMouseX = 0;
+  let startMouseY = 0;
+
   codeInput.value = CODE_PRESETS.preset_if;
   updateLineNumbers();
 
@@ -818,7 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   codeInput.addEventListener('input', () => {
     updateLineNumbers();
-    savedInputs = []; // Xóa bộ nhớ tạm khi mã nguồn thay đổi
+    savedInputs = [];
     resetSimulation();
   });
 
@@ -826,27 +891,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (CODE_PRESETS[e.target.value]) {
       codeInput.value = CODE_PRESETS[e.target.value];
       updateLineNumbers();
-      savedInputs = []; // Xóa bộ nhớ tạm khi chọn bài mẫu mới
-      buildAndRenderFlowchart();
-    }
-  });
-
-  btnSyncPastedCode.addEventListener('click', () => {
-    if (pasteFallbackCode.value.trim().length > 0) {
-      codeInput.value = pasteFallbackCode.value.trim();
-      updateLineNumbers();
       savedInputs = [];
-      tabBtnEditor.click();
       buildAndRenderFlowchart();
     }
   });
 
-  // Tab Switchers
+  if(btnSyncPastedCode) {
+      btnSyncPastedCode.addEventListener('click', () => {
+        if (pasteFallbackCode && pasteFallbackCode.value.trim().length > 0) {
+          codeInput.value = pasteFallbackCode.value.trim();
+          updateLineNumbers();
+          savedInputs = [];
+          tabBtnEditor.click();
+          buildAndRenderFlowchart();
+        }
+      });
+  }
+
   tabBtnEditor.addEventListener('click', () => {
     tabBtnEditor.classList.add('border-blue-500', 'text-blue-400', 'font-semibold', 'bg-slate-900/40');
-    tabBtnEditor.classList.remove('border-transparent');
+    tabBtnEditor.classList.remove('border-transparent', 'text-slate-400');
     tabBtnOnlinePython.classList.remove('border-blue-500', 'text-blue-400', 'font-semibold', 'bg-slate-900/40');
-    tabBtnOnlinePython.classList.add('border-transparent');
+    tabBtnOnlinePython.classList.add('border-transparent', 'text-slate-400');
     tabContentEditor.classList.remove('hidden');
     tabContentOnlinePython.classList.add('hidden');
     tabContentEditor.classList.add('flex');
@@ -854,15 +920,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabBtnOnlinePython.addEventListener('click', () => {
     tabBtnOnlinePython.classList.add('border-blue-500', 'text-blue-400', 'font-semibold', 'bg-slate-900/40');
-    tabBtnOnlinePython.classList.remove('border-transparent');
+    tabBtnOnlinePython.classList.remove('border-transparent', 'text-slate-400');
     tabBtnEditor.classList.remove('border-blue-500', 'text-blue-400', 'font-semibold', 'bg-slate-900/40');
-    tabBtnEditor.classList.add('border-transparent');
+    tabBtnEditor.classList.add('border-transparent', 'text-slate-400');
     tabContentOnlinePython.classList.remove('hidden');
     tabContentEditor.classList.add('hidden');
     tabContentOnlinePython.classList.add('flex');
   });
 
-  /* Flowchart Builder */
   function buildAndRenderFlowchart() {
     resetSimulation();
     try {
@@ -870,6 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentGraph = layoutEngine.buildCFG(currentAST);
       svgRenderer.render(currentGraph.nodes, currentGraph.edges);
       terminalOutput.textContent = '> Lưu đồ đã tạo thành công. Khối KẾT THÚC nằm ở dưới cùng.';
+      resetPanZoom();
     } catch (err) {
       console.error('Syntax/Parsing error:', err);
       terminalOutput.textContent = '> Lỗi cú pháp mã nguồn: ' + err.message;
@@ -881,18 +947,15 @@ document.addEventListener('DOMContentLoaded', () => {
     buildAndRenderFlowchart();
   });
 
-  /* Interactive Input Helper với cơ chế Caching */
   function requestUserInput(promptMsg, varName) {
-    // NẾU ĐANG CHẠY LẠI VÀ CÓ DỮ LIỆU CŨ -> TỰ ĐỘNG DÙNG LẠI
     if (isReusingInputs && inputIndex < savedInputs.length) {
       const val = savedInputs[inputIndex++];
       return Promise.resolve(val);
     }
 
-    // NẾU CHƯA CÓ DỮ LIỆU CŨ -> BẬT POPUP HỎI VÀ LƯU VÀO BỘ NHỚ
     return new Promise((resolve) => {
       pendingInputResolver = (val) => {
-        savedInputs.push(val); // Lưu lại dữ liệu cho các lần chạy sau
+        savedInputs.push(val);
         resolve(val);
       };
       inputModalPrompt.innerHTML = `${promptMsg} <br><span class="text-cyan-400">(Biến: <b>${varName}</b>)</span>:`;
@@ -916,19 +979,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') btnSubmitInput.click();
   });
 
-  /* Hàm Khởi chạy Mô phỏng */
   async function startSimulation(reuseOldInputs = false) {
     if (!currentGraph) buildAndRenderFlowchart();
 
     stopAutoPlay();
 
-    // Thiết lập trạng thái sử dụng dữ liệu cũ
     if (reuseOldInputs && savedInputs.length > 0) {
       isReusingInputs = true;
       inputIndex = 0;
     } else {
       isReusingInputs = false;
-      savedInputs = []; // Xóa bộ nhớ cũ nếu đây là lần mô phỏng hoàn toàn mới
+      savedInputs = [];
       inputIndex = 0;
     }
 
@@ -965,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (traceSteps.length > 0 && currentStepIdx < traceSteps.length - 1) {
       startAutoPlay();
     } else {
-      startSimulation(false); // Bắt đầu mô phỏng mới (hỏi lại dữ liệu)
+      startSimulation(false);
     }
   });
 
@@ -1032,7 +1093,6 @@ document.addEventListener('DOMContentLoaded', () => {
     codeHighlights.innerHTML = '';
   }
 
-  /* Step Renderer */
   function renderStep(idx) {
     if (idx < 0 || idx >= traceSteps.length) return;
 
@@ -1115,28 +1175,78 @@ document.addEventListener('DOMContentLoaded', () => {
     terminalOutput.textContent = '> Terminal cleared.';
   });
 
-  // Zoom Controls
-  btnZoomIn.addEventListener('click', () => {
-    zoomLevel = Math.min(zoomLevel + 0.15, 2.0);
-    applySvgZoom();
-  });
-
-  btnZoomOut.addEventListener('click', () => {
-    zoomLevel = Math.max(zoomLevel - 0.15, 0.5);
-    applySvgZoom();
-  });
-
-  btnResetZoom.addEventListener('click', () => {
-    zoomLevel = 1.0;
-    applySvgZoom();
-  });
-
-  function applySvgZoom() {
-    flowchartSvg.style.transform = `scale(${zoomLevel})`;
+  /* =========================================================================
+   * 7. PAN & DRAG CANVAS + SCROLL-TO-ZOOM CONTROLLER
+   * ========================================================================= */
+  function applySvgTransform(smooth = false) {
+    flowchartSvg.style.transition = smooth ? 'transform 0.15s ease-out' : 'none';
+    flowchartSvg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
     btnResetZoom.textContent = `${Math.round(zoomLevel * 100)}%`;
   }
 
-  // Download SVG Image
+  function resetPanZoom() {
+    zoomLevel = 1.0;
+    panX = 0;
+    panY = 0;
+    applySvgTransform(true);
+  }
+
+  svgContainer.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; 
+    isDragging = true;
+    startMouseX = e.clientX - panX;
+    startMouseY = e.clientY - panY;
+    svgContainer.classList.remove('cursor-grab');
+    svgContainer.classList.add('cursor-grabbing');
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    panX = e.clientX - startMouseX;
+    panY = e.clientY - startMouseY;
+    applySvgTransform(false);
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      svgContainer.classList.remove('cursor-grabbing');
+      svgContainer.classList.add('cursor-grab');
+    }
+  });
+
+  svgContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+    const oldZoom = zoomLevel;
+    const newZoom = Math.min(Math.max(0.3, zoomLevel * zoomFactor), 3.0);
+
+    if (newZoom === oldZoom) return;
+
+    const rect = svgContainer.getBoundingClientRect();
+    const mouseX = e.clientX - (rect.left + rect.width / 2);
+    const mouseY = e.clientY - (rect.top + rect.height / 2);
+
+    const actualRatio = newZoom / oldZoom;
+    panX = mouseX - (mouseX - panX) * actualRatio;
+    panY = mouseY - (mouseY - panY) * actualRatio;
+
+    zoomLevel = newZoom;
+    applySvgTransform(true);
+  }, { passive: false });
+
+  btnZoomIn.addEventListener('click', () => {
+    zoomLevel = Math.min(zoomLevel + 0.2, 3.0);
+    applySvgTransform(true);
+  });
+
+  btnZoomOut.addEventListener('click', () => {
+    zoomLevel = Math.max(zoomLevel - 0.2, 0.3);
+    applySvgTransform(true);
+  });
+
+  btnResetZoom.addEventListener('click', resetPanZoom);
+
   btnExportSVG.addEventListener('click', () => {
     const svgData = flowchartSvg.outerHTML;
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
@@ -1149,7 +1259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(downloadLink);
   });
 
-  // Fullscreen Online Python IDE
   if (btnFullscreenIframe && onlinePythonIframe) {
     btnFullscreenIframe.addEventListener('click', () => {
       if (onlinePythonIframe.requestFullscreen) {
@@ -1160,7 +1269,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Fullscreen Flowchart Panel
   if (btnFullscreenFlow && flowchartPanel) {
     btnFullscreenFlow.addEventListener('click', () => {
       if (!document.fullscreenElement) {
@@ -1177,19 +1285,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* SỰ KIỆN NÚT NỔI "CHẠY LẠI (DỮ LIỆU CŨ)" */
   if (btnFloatingSim) {
     btnFloatingSim.addEventListener('click', () => {
       if (savedInputs.length > 0) {
-        // Đã có dữ liệu nhập trước đó -> Chạy lại trực tiếp bằng dữ liệu cũ
         startSimulation(true);
       } else {
-        // Chưa có dữ liệu -> Chạy mô phỏng mới và hỏi dữ liệu nhập
         startSimulation(false);
       }
     });
   }
 
-  // Initial Build on Load
   buildAndRenderFlowchart();
 });

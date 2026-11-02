@@ -1,0 +1,321 @@
+/* ==========================================================================
+   PYTHON FLOW SIMULATOR - MODERN UI/UX REDESIGN
+   Theme: Modern Educational IDE & Clean Dashboard
+   ========================================================================== */
+
+/* --- 1. DESIGN SYSTEM & CSS VARIABLES --- */
+:root {
+  /* Bảng màu Nền (Backgrounds & Surfaces) */
+  --bg-root: #0B1120;         /* Nền tổng tối sâu, ngả xanh ngọc (Deep Navy) */
+  --bg-surface: #111827;      /* Bề mặt panel, nhạt hơn nền gốc */
+  --bg-surface-hover: #1F2937;
+  --bg-editor: #0D1322;       /* Nền khu vực gõ code (Tương phản cao hơn) */
+  --bg-terminal: #050811;     /* Nền terminal (Đen thẳm để nổi bật chữ xanh) */
+  
+  /* Bảng màu Viền (Borders) */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-focus: #3B82F6;
+  
+  /* Bảng màu Chữ (Typography) */
+  --text-primary: #F8FAFC;    /* Trắng sáng (Heading, text chính) */
+  --text-secondary: #94A3B8;  /* Xám nhạt (Mô tả, nhãn phụ) */
+  --text-muted: #64748B;      /* Xám tối (Placeholder, disable) */
+  
+  /* Bảng màu Trạng thái & Nhấn (Accents & States) */
+  --color-primary: #3B82F6;     /* Blue (Mặc định) */
+  --color-primary-glow: rgba(59, 130, 246, 0.4);
+  --color-success: #10B981;     /* Emerald (Thực thi, đúng) */
+  --color-success-glow: rgba(16, 185, 129, 0.4);
+  --color-danger: #F43F5E;      /* Rose (Lỗi, sai, kết thúc) */
+  --color-danger-glow: rgba(244, 63, 94, 0.4);
+  --color-warning: #F59E0B;     /* Amber (Cảnh báo, biến) */
+  --color-info: #0EA5E9;        /* Sky (Thông tin) */
+
+  /* Kích thước & Hiệu ứng (Metrics & Transitions) */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-float: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 12px var(--color-primary-glow);
+  --transition-fast: 0.15s ease-out;
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- 2. CÀI ĐẶT CHUNG (GLOBAL STYLES) --- */
+body {
+  background-color: var(--bg-root) !important;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  selection-background: var(--color-primary-glow);
+}
+
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: #fff;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* --- 3. THANH CUỘN (CUSTOM SCROLLBARS) --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background var(--transition-fast);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* --- 4. KHU VỰC SOẠN THẢO (CODE EDITOR) --- */
+/* Cải thiện hiển thị textarea code */
+#pythonCodeInput {
+  caret-color: var(--color-info);
+  line-height: 1.5rem !important; /* Đảm bảo khớp chính xác với highlight */
+  color: #E2E8F0;
+  tab-size: 4;
+}
+#pythonCodeInput:focus {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* Cột số dòng (Line Numbers) */
+#lineNumbers {
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  border-right: 1px solid var(--border-subtle);
+  line-height: 1.5rem !important;
+}
+
+/* Lớp đánh dấu dòng đang thực thi (Active Line Highlight) */
+.line-active {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.02) 100%) !important;
+  border-left: 3px solid var(--color-success);
+  box-shadow: inset 1px 0 0 0 rgba(255,255,255,0.05);
+  border-radius: 0 4px 4px 0;
+  z-index: 0;
+  transition: top var(--transition-fast) !important;
+}
+
+/* Terminal & Variables Table */
+#terminalOutput {
+  background-color: var(--bg-terminal);
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+#variablesTableBody tr {
+  transition: background-color var(--transition-fast);
+}
+#variablesTableBody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* --- 5. NÚT BẤM VÀ ĐIỀU KHIỂN (BUTTONS & CONTROLS) --- */
+button {
+  transition: all var(--transition-fast) !important;
+  outline: none;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: saturate(0.2);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Tùy chỉnh thanh tốc độ (Range Slider) */
+input[type=range] {
+  -webkit-appearance: none;
+  background: var(--border-strong);
+  border-radius: 4px;
+  height: 4px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+/* --- 6. KHÔNG GIAN LƯU ĐỒ (SVG CANVAS) --- */
+/* Nền lưới chuyên nghiệp */
+#svgContainer {
+  background-color: var(--bg-root);
+  background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: center center;
+}
+
+/* Hiệu ứng khi kéo thả (Grab/Grabbing) */
+#svgContainer.cursor-grab { cursor: grab; }
+#svgContainer.cursor-grabbing { cursor: grabbing; }
+
+/* SVG Nodes (Các khối lưu đồ) */
+.fc-node {
+  transition: filter var(--transition-smooth), transform var(--transition-fast);
+  cursor: pointer;
+}
+.fc-node:hover rect, 
+.fc-node:hover polygon, 
+.fc-node:hover circle {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6)) brightness(1.2) !important;
+}
+
+/* Trạng thái khối đang chạy (Active Node) */
+.fc-node.active rect, 
+.fc-node.active polygon, 
+.fc-node.active circle {
+  stroke: var(--color-success) !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 16px var(--color-success-glow)) brightness(1.1) !important;
+  animation: pulse-active 1.5s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Trạng thái khối Kết thúc (End Node) */
+.fc-node.active-end rect {
+  stroke: var(--color-danger) !important;
+  fill: #4C0519 !important; /* Nền đỏ bọc đô */
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 20px var(--color-danger-glow)) !important;
+  animation: pulse-end 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-active {
+  0% { filter: drop-shadow(0 0 8px var(--color-success-glow)); }
+  100% { filter: drop-shadow(0 0 24px rgba(16, 185, 129, 0.7)); }
+}
+
+@keyframes pulse-end {
+  0% { filter: drop-shadow(0 0 10px var(--color-danger-glow)); }
+  100% { filter: drop-shadow(0 0 28px rgba(244, 63, 94, 0.8)); }
+}
+
+/* SVG Edges (Đường nối & Mũi tên) */
+.fc-edge {
+  stroke: #475569; /* Slate-600 */
+  stroke-width: 2px;
+  fill: none;
+  transition: stroke var(--transition-smooth), stroke-width var(--transition-smooth);
+}
+.fc-edge.active {
+  stroke: var(--color-success) !important;
+  stroke-width: 3px !important;
+  stroke-dasharray: 8 6;
+  animation: flow-dash 1s linear infinite;
+  filter: drop-shadow(0 0 6px var(--color-success-glow));
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -28; }
+}
+
+/* Chú giải lưu đồ (Legend) */
+.legend-box {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+}
+
+/* --- 7. MODAL NHẬP LIỆU (INPUT MODAL) --- */
+/* Glassmorphism Backdrop */
+.modal-backdrop {
+  background-color: rgba(3, 7, 18, 0.65) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fade-in 0.25s ease-out forwards;
+}
+
+/* Modal Box Animation */
+.modal-backdrop > div {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  animation: slide-up-zoom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up-zoom {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+/* Ô input trong Modal */
+#modalInputValue {
+  background-color: var(--bg-root);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+#modalInputValue:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
+  outline: none;
+}
+
+/* --- 8. RESPONSIVE DESIGN & TWEAKS --- */
+@media (max-width: 1024px) {
+  /* Tối ưu header cho Tablet */
+  header h1 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Đảo bố cục trên Mobile/Tablet nhỏ */
+  #flowchartPanel {
+    min-height: 60vh;
+    border-top: 1px solid var(--border-strong);
+  }
+  .modal-backdrop > div {
+    margin: 0 20px;
+    padding: 20px;
+  }
+  #btnStartSim {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Ngăn ngừa tràn ngang (Overflow hidden cho body đã có ở HTML, chỉ phòng ngừa bổ sung) */
+.overflow-hidden-x {
+  overflow-x: hidden !important;
+}

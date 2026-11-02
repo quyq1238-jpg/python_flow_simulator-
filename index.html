@@ -16,105 +16,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* SVG Flowchart Shape Animations */
-    .fc-node {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-    }
-    .fc-node:hover rect, .fc-node:hover polygon, .fc-node:hover circle {
-      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
-    }
-
-    /* Glowing Active Highlight for Executing Flowchart Nodes */
-    .fc-node.active rect, 
-    .fc-node.active polygon, 
-    .fc-node.active circle {
-      stroke: #38bdf8 !important;
-      stroke-width: 3.5px !important;
-      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.95));
-      animation: pulse-node 1.4s infinite alternate ease-in-out;
-    }
-
-    /* End Node Special Glowing State */
-    .fc-node.active-end rect {
-      stroke: #f43f5e !important;
-      fill: #881337 !important;
-      stroke-width: 4px !important;
-      filter: drop-shadow(0 0 20px rgba(244, 63, 94, 0.95));
-      animation: pulse-end 1.2s infinite alternate ease-in-out;
-    }
-
-    @keyframes pulse-node {
-      0% { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5)); transform: scale(1); }
-      100% { filter: drop-shadow(0 0 18px rgba(56, 189, 248, 1)); transform: scale(1.02); }
-    }
-
-    @keyframes pulse-end {
-      0% { filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.6)); }
-      100% { filter: drop-shadow(0 0 22px rgba(244, 63, 94, 1)); }
-    }
-
-    /* Flow Arrow Edge Animations */
-    .fc-edge {
-      stroke: #64748b;
-      stroke-width: 2px;
-      fill: none;
-      transition: all 0.3s ease;
-    }
-    .fc-edge.active {
-      stroke: #38bdf8;
-      stroke-width: 3.5px;
-      stroke-dasharray: 7 4;
-      animation: flowDash 0.75s linear infinite;
-      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));
-    }
-
-    @keyframes flowDash {
-      to {
-        stroke-dashoffset: -22;
-      }
-    }
-
-    /* Active Code Line Highlight */
-    .line-active {
-      background-color: rgba(56, 189, 248, 0.22) !important;
-      border-left: 4px solid #38bdf8;
-    }
-
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #090d16;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
-
-    .modal-backdrop {
-      background-color: rgba(2, 6, 23, 0.85);
-      backdrop-filter: blur(5px);
-    }
-  </style>
+  <!-- Custom Stylesheet (Đặt sau Tailwind để có thể ghi đè) -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="h-full flex flex-col overflow-hidden bg-slate-950 text-slate-100">
 
   <!-- Top Navigation Header -->
-  <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-lg">
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-lg relative z-20">
     <div class="flex items-center space-x-3">
       <div class="bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 p-2.5 rounded-xl shadow-md">
         <i class="fa-solid fa-diagram-project text-xl text-white"></i>
@@ -124,26 +32,30 @@
           PYTHON FLOW SIMULATOR
           <span class="text-[10px] bg-blue-500/20 text-blue-400 font-mono px-2 py-0.5 rounded-full border border-blue-500/30 uppercase font-semibold">Chuẩn SGK Tin Học</span>
         </h1>
-        <p class="text-xs text-slate-400">Mô phỏng thuật toán, lưu đồ chuẩn quy cách & thực thi từng bước Python</p>
+        <p class="text-xs text-slate-400 mt-0.5">Mô phỏng thuật toán, lưu đồ chuẩn quy cách & thực thi từng bước Python</p>
       </div>
     </div>
 
     <!-- Toolbar Controls & Example Selector -->
-    <div class="flex items-center flex-wrap gap-2">
-      <div class="flex items-center bg-slate-950 rounded-lg px-2.5 py-1 border border-slate-800">
+    <div class="flex items-center flex-wrap gap-3">
+      <div class="flex items-center bg-slate-950 rounded-lg px-3 py-1.5 border border-slate-800 shadow-inner">
         <label for="presetSelect" class="text-xs font-medium text-slate-300 pr-2 flex items-center gap-1.5 shrink-0">
           <i class="fa-solid fa-book-bookmark text-blue-400"></i> Bài mẫu:
         </label>
         <select id="presetSelect" class="bg-transparent text-xs text-slate-100 outline-none cursor-pointer py-1 font-medium">
-          <option value="preset_if" class="bg-slate-900" selected>1. Rẽ nhánh: Số Âm / Dương / 0 (If-Elif-Else)</option>
-          <option value="preset_while" class="bg-slate-900">2. Vòng lặp While: Tính tổng S = 1 + ... + N</option>
+          <option value="preset_if" class="bg-slate-900" selected>1. Rẽ nhánh: Số Âm / Dương / 0</option>
+          <option value="preset_while" class="bg-slate-900">2. Lặp While: Tính tổng S = 1 + ... + N</option>
           <option value="preset_evenodd" class="bg-slate-900">3. Rẽ nhánh: Kiểm tra số Chẵn hay Lẻ</option>
-          <option value="preset_for" class="bg-slate-900">4. Vòng lặp For: Đếm số & tính giai thừa</option>
+          <option value="preset_for" class="bg-slate-900">4. Lặp For: Đếm số & tính giai thừa</option>
           <option value="preset_avg" class="bg-slate-900">5. Tuần tự: Tính trung bình cộng 2 số</option>
+          <option value="preset_list" class="bg-slate-900">6. Kiểu dữ liệu danh sách (List)</option>
+          <option value="preset_string" class="bg-slate-900">7. Xâu kí tự (String)</option>
+          <option value="preset_func" class="bg-slate-900">8. Hàm trong Python (Functions)</option>
+          <option value="preset_scope" class="bg-slate-900">9. Phạm vi của biến (Variable Scope)</option>
         </select>
       </div>
 
-      <button id="btnBuildFlow" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-blue-900/20">
+      <button id="btnBuildFlow" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-blue-900/40">
         <i class="fa-solid fa-arrows-rotate"></i> Tạo lưu đồ
       </button>
     </div>
@@ -153,14 +65,14 @@
   <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
     <!-- LEFT PANEL: Code Editor & Execution Status -->
-    <div class="w-full md:w-5/12 lg:w-4/12 flex flex-col bg-slate-900/80 border-r border-slate-800 h-full overflow-hidden shrink-0">
+    <div class="w-full md:w-5/12 lg:w-4/12 flex flex-col bg-slate-900 border-r border-slate-800 h-full overflow-hidden shrink-0 shadow-xl z-10">
       
       <!-- Panel Tabs -->
-      <div class="flex border-b border-slate-800 bg-slate-950/80 text-xs font-medium text-slate-400">
-        <button id="tabBtnEditor" class="flex-1 py-2.5 px-3 text-center border-b-2 border-blue-500 text-blue-400 font-semibold flex items-center justify-center gap-2 bg-slate-900/40">
+      <div class="flex border-b border-slate-800 bg-slate-950 text-xs font-medium text-slate-400">
+        <button id="tabBtnEditor" class="flex-1 py-3 px-3 text-center border-b-2 border-blue-500 text-blue-400 font-semibold flex items-center justify-center gap-2 bg-slate-900/40 transition-colors">
           <i class="fa-solid fa-code"></i> Soạn Thảo Python
         </button>
-        <button id="tabBtnOnlinePython" class="flex-1 py-2.5 px-3 text-center border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-2">
+        <button id="tabBtnOnlinePython" class="flex-1 py-3 px-3 text-center border-b-2 border-transparent hover:text-slate-200 hover:bg-slate-900/20 flex items-center justify-center gap-2 transition-colors">
           <i class="fa-brands fa-python"></i> Online Python IDE
         </button>
       </div>
@@ -169,8 +81,8 @@
       <div id="tabContentEditor" class="flex-1 flex flex-col overflow-hidden">
         
         <!-- Code Editor Area -->
-        <div class="relative flex-1 flex bg-slate-950 font-mono text-xs overflow-hidden border-b border-slate-800">
-          <div id="lineNumbers" class="w-10 py-3 bg-slate-900/60 text-slate-500 text-right pr-2 select-none border-r border-slate-800/60 leading-6">
+        <div class="relative flex-1 flex bg-[#090d16] font-mono text-xs overflow-hidden border-b border-slate-800">
+          <div id="lineNumbers" class="w-10 py-3 bg-slate-950 text-slate-500 text-right pr-2 select-none border-r border-slate-800/80 leading-6 text-[11px]">
             1
           </div>
           <div class="relative flex-1 overflow-auto">
@@ -182,83 +94,82 @@
         </div>
 
         <!-- Simulation Control Panel -->
-        <div class="p-3 bg-slate-900 border-b border-slate-800 flex flex-col gap-2.5">
+        <div class="p-3.5 bg-slate-900 border-b border-slate-800 flex flex-col gap-3">
           <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5">
-              <button id="btnStartSim" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-900/30 transition">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button id="btnStartSim" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-900/30">
                 <i class="fa-solid fa-play"></i> Mô phỏng
               </button>
-              <button id="btnStepPrev" disabled class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1 border border-slate-700 transition">
+              <button id="btnStepPrev" disabled class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1 border border-slate-700">
                 <i class="fa-solid fa-rotate-left"></i> Lùi
               </button>
-              <button id="btnStepNext" disabled class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-md shadow-blue-900/20 transition">
+              <button id="btnStepNext" disabled class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-md shadow-blue-900/20">
                 Tiếp <i class="fa-solid fa-chevron-right"></i>
               </button>
-              <button id="btnResetSim" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg text-xs border border-slate-700 transition" title="Làm lại">
+              <button id="btnResetSim" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg text-xs border border-slate-700" title="Làm lại">
                 <i class="fa-solid fa-arrow-rotate-left"></i>
               </button>
             </div>
 
             <!-- Auto-Play Speed Adjustment Slider -->
-            <div class="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-              <i class="fa-solid fa-gauge-high text-xs text-slate-400"></i>
-              <input id="speedRange" type="range" min="200" max="1800" step="100" value="900" class="w-16 h-1 accent-blue-500 cursor-pointer" title="Tốc độ tự động chạy">
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hidden sm:flex">
+              <i class="fa-solid fa-gauge-high text-xs text-slate-500"></i>
+              <input id="speedRange" type="range" min="200" max="1800" step="100" value="900" class="w-16" title="Tốc độ tự động chạy">
             </div>
           </div>
 
           <!-- Step Progress Label -->
-          <div class="flex items-center justify-between text-xs text-slate-400 px-1 pt-0.5">
+          <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
             <span id="stepCounterText" class="font-medium">Trạng thái: Sẵn sàng mô phỏng</span>
             <span id="stepPercentage" class="font-mono text-cyan-400 font-semibold bg-cyan-950/60 border border-cyan-800/50 px-2 py-0.5 rounded">Bước 0/0</span>
           </div>
         </div>
 
         <!-- Step Explanation ("Điều gì đang xảy ra?") -->
-        <div class="h-40 bg-slate-950 flex flex-col border-b border-slate-800 overflow-hidden">
-          <div class="bg-slate-900/90 px-3 py-1.5 text-xs font-semibold text-slate-300 flex items-center justify-between border-b border-slate-800">
+        <div class="h-44 bg-slate-950 flex flex-col border-b border-slate-800 overflow-hidden">
+          <div class="bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 flex items-center justify-between border-b border-slate-800">
             <span class="flex items-center gap-1.5 text-cyan-400">
-              <i class="fa-solid fa-circle-info"></i> Điều gì đang xảy ra?
+              <i class="fa-solid fa-circle-info"></i> Giải thích thuật toán
             </span>
-            <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">Giải thích từng bước</span>
           </div>
-          <div id="stepExplanation" class="p-3 text-xs text-slate-200 overflow-y-auto leading-relaxed flex-1 space-y-1">
+          <div id="stepExplanation" class="p-3.5 text-[13px] text-slate-200 overflow-y-auto leading-relaxed flex-1 space-y-1.5">
             <p class="text-slate-500 italic">Nhấn nút <b>[▶ Mô phỏng]</b> để bắt đầu theo dõi luồng thực thi và lưu đồ thuật toán.</p>
           </div>
         </div>
 
         <!-- Variable Watcher & Simulated Terminal Output -->
-        <div class="flex-1 flex flex-col min-h-[140px] bg-slate-950 overflow-hidden">
+        <div class="flex-1 flex flex-col min-h-[160px] bg-slate-950 overflow-hidden">
           <div class="grid grid-cols-2 h-full">
             
             <!-- Live Variable Tracker Table -->
-            <div class="border-r border-slate-800 flex flex-col overflow-hidden">
-              <div class="bg-slate-900/90 px-2.5 py-1 text-[11px] font-semibold text-amber-400 border-b border-slate-800 flex items-center gap-1.5">
+            <div class="border-r border-slate-800 flex flex-col overflow-hidden bg-slate-900/30">
+              <div class="bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-amber-400 border-b border-slate-800 flex items-center gap-1.5 tracking-wider uppercase">
                 <i class="fa-solid fa-square-poll-vertical"></i> Giá trị biến
               </div>
               <div class="flex-1 overflow-y-auto p-2">
                 <table class="w-full text-left text-xs font-mono">
                   <thead>
-                    <tr class="text-slate-500 border-b border-slate-800 text-[10px]">
-                      <th class="pb-1 font-semibold">Tên biến</th>
-                      <th class="pb-1 font-semibold">Giá trị thực tế</th>
+                    <tr class="text-slate-500 border-b border-slate-700/50 text-[10px] uppercase">
+                      <th class="pb-1.5 pl-1 font-semibold">Tên biến</th>
+                      <th class="pb-1.5 pl-1 font-semibold">Giá trị thực tế</th>
                     </tr>
                   </thead>
                   <tbody id="variablesTableBody">
-                    <tr><td colspan="2" class="text-slate-600 text-[11px] py-2 italic">Chưa có biến nào</td></tr>
+                    <tr><td colspan="2" class="text-slate-600 text-[11px] py-3 italic text-center">Chưa có dữ liệu</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
 
             <!-- Terminal Console -->
-            <div class="flex flex-col overflow-hidden bg-black/80 font-mono">
-              <div class="bg-slate-900/90 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex flex-col overflow-hidden bg-[#000000] font-mono shadow-inner">
+              <div class="bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-emerald-400 border-b border-slate-800 flex items-center justify-between tracking-wider uppercase">
                 <span class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-terminal"></i> Output Terminal
+                  <i class="fa-solid fa-terminal"></i> Terminal
                 </span>
-                <button id="btnClearTerminal" class="text-[10px] text-slate-500 hover:text-slate-300">Xóa</button>
+                <button id="btnClearTerminal" class="text-[10px] text-slate-500 hover:text-slate-300 transition-colors">Clear</button>
               </div>
-              <div id="terminalOutput" class="flex-1 p-2 text-xs text-emerald-400 overflow-y-auto whitespace-pre-wrap leading-5">
+              <div id="terminalOutput" class="flex-1 p-2.5 text-xs text-emerald-400 overflow-y-auto whitespace-pre-wrap leading-5">
                 > Hệ thống đã sẵn sàng.
               </div>
             </div>
@@ -270,22 +181,22 @@
 
       <!-- Tab Content 2: Online Python Embedded / Fallback Area -->
       <div id="tabContentOnlinePython" class="flex-1 hidden flex-col bg-slate-950">
-        <div class="p-2.5 bg-slate-900 text-xs text-slate-300 border-b border-slate-800 flex items-center justify-between">
-          <span class="flex items-center gap-1.5"><i class="fa-brands fa-python text-amber-400"></i> Trình soạn thảo Online Python</span>
+        <div class="p-3 bg-slate-900 text-xs text-slate-300 border-b border-slate-800 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><i class="fa-brands fa-python text-amber-400"></i> Môi trường Online Python</span>
           <div class="flex items-center gap-2">
-            <button id="btnFullscreenIframe" class="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 text-[11px] bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 transition shadow-sm" title="Phóng to toàn màn hình IDE">
+            <button id="btnFullscreenIframe" class="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 text-[11px] bg-emerald-500/10 px-2.5 py-1.5 rounded border border-emerald-500/20 transition shadow-sm" title="Phóng to toàn màn hình IDE">
               <i class="fa-solid fa-expand"></i> Phóng to
             </button>
             <a href="https://www.online-python.com/" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1 text-[11px]">
-              Mở trang gốc <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+              Mở tab mới <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
             </a>
           </div>
         </div>
-        <div class="p-3 bg-slate-900/40 border-b border-slate-800 flex flex-col gap-2 text-xs">
-          <p class="text-slate-400">Nếu bạn viết code ở Online Python bên dưới, hãy copy và dán vào ô bên dưới để đồng bộ sang công cụ mô phỏng:</p>
+        <div class="p-4 bg-slate-900/40 border-b border-slate-800 flex flex-col gap-2 text-xs">
+          <p class="text-slate-400">Nhập code vào iframe bên dưới, sau đó copy và dán vào đây để đồng bộ sang bộ mô phỏng:</p>
           <div class="flex gap-2">
-            <textarea id="pasteFallbackCode" class="flex-1 bg-slate-950 border border-slate-700 rounded p-2 text-xs font-mono text-slate-200 h-16 resize-none" placeholder="Dán code Python từ Online Python vào đây..."></textarea>
-            <button id="btnSyncPastedCode" class="px-3 bg-blue-600 hover:bg-blue-500 text-white rounded font-semibold shrink-0 text-xs flex flex-col items-center justify-center gap-1">
+            <textarea id="pasteFallbackCode" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs font-mono text-slate-200 h-16 resize-none focus:border-blue-500 outline-none transition" placeholder="Dán code Python vào đây..."></textarea>
+            <button id="btnSyncPastedCode" class="px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold shrink-0 text-xs flex flex-col items-center justify-center gap-1 shadow-md transition">
               <i class="fa-solid fa-file-import"></i>
               Đồng bộ
             </button>
@@ -300,42 +211,41 @@
     <div id="flowchartPanel" class="w-full md:w-7/12 lg:w-8/12 flex flex-col bg-slate-950 h-full relative overflow-hidden">
       
       <!-- Flowchart Header Toolbar -->
-      <div class="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex items-center justify-between z-10 shadow-sm">
+      <div class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between z-10 shadow-sm">
         <div class="flex items-center space-x-2">
           <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-            <i class="fa-solid fa-sitemap text-blue-400"></i> MÔ PHỎNG LƯU ĐỒ THUẬT TOÁN
+            <i class="fa-solid fa-sitemap text-blue-400"></i> LƯU ĐỒ THUẬT TOÁN
           </span>
-          <span class="text-[10px] text-slate-500 hidden lg:inline-block">
-            (Ô KẾT THÚC luôn nằm ở vị trí dưới cùng duy nhất)
+          <span class="text-[10px] text-slate-500 hidden lg:inline-block font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+            Dùng chuột kéo để di chuyển & cuộn chuột để zoom
           </span>
         </div>
 
         <!-- SVG Zoom, Download & Fullscreen Controls -->
         <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
-          <button id="btnZoomOut" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800" title="Thu nhỏ">
+          <button id="btnZoomOut" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800 transition-colors" title="Thu nhỏ">
             <i class="fa-solid fa-magnifying-glass-minus"></i>
           </button>
-          <button id="btnResetZoom" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800 font-mono" title="Tỷ lệ ban đầu">
+          <button id="btnResetZoom" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800 font-mono transition-colors" title="Tỷ lệ & vị trí ban đầu">
             100%
           </button>
-          <button id="btnZoomIn" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800" title="Phóng to">
+          <button id="btnZoomIn" class="p-1.5 text-slate-400 hover:text-white text-xs rounded hover:bg-slate-800 transition-colors" title="Phóng to">
             <i class="fa-solid fa-magnifying-glass-plus"></i>
           </button>
-          <div class="w-px h-4 bg-slate-800 my-auto mx-1"></div>
-          <button id="btnExportSVG" class="p-1.5 text-cyan-400 hover:text-cyan-300 text-xs rounded hover:bg-slate-800 flex items-center gap-1" title="Tải ảnh SVG lưu đồ">
-            <i class="fa-solid fa-download"></i> <span class="hidden sm:inline text-[11px] font-medium">Tải SVG</span>
+          <div class="w-px h-4 bg-slate-800 my-auto mx-1.5"></div>
+          <button id="btnExportSVG" class="p-1.5 text-cyan-400 hover:text-cyan-300 text-xs rounded hover:bg-slate-800 flex items-center gap-1.5 transition-colors" title="Tải ảnh SVG lưu đồ">
+            <i class="fa-solid fa-download"></i> <span class="hidden sm:inline text-[11px] font-medium">Lưu SVG</span>
           </button>
-          <div class="w-px h-4 bg-slate-800 my-auto mx-1"></div>
-          <button id="btnFullscreenFlow" class="p-1.5 text-amber-400 hover:text-amber-300 text-xs rounded hover:bg-slate-800 flex items-center gap-1" title="Trình chiếu Toàn màn hình">
+          <div class="w-px h-4 bg-slate-800 my-auto mx-1.5"></div>
+          <button id="btnFullscreenFlow" class="p-1.5 text-amber-400 hover:text-amber-300 text-xs rounded hover:bg-slate-800 flex items-center gap-1.5 transition-colors" title="Trình chiếu Toàn màn hình">
             <i class="fa-solid fa-expand"></i> <span class="hidden sm:inline text-[11px] font-medium">Toàn màn hình</span>
           </button>
         </div>
       </div>
 
       <!-- Interactive SVG Flowchart Render Canvas -->
-      <div id="svgContainer" class="flex-1 w-full h-full overflow-auto relative bg-slate-950 flex items-start justify-center p-8 select-none">
-        <svg id="flowchartSvg" class="transition-transform duration-150 origin-top-center max-w-full" style="min-width: 620px; min-height: 750px;">
-          <!-- SVG Definitions for Markers & Shadows -->
+      <div id="svgContainer" class="flex-1 w-full h-full overflow-hidden relative flex items-start justify-center p-8 select-none cursor-grab active:cursor-grabbing">
+        <svg id="flowchartSvg" class="origin-top-center max-w-full" style="min-width: 620px; min-height: 750px; transform-origin: center top;">
           <defs>
             <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
@@ -344,11 +254,10 @@
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
             </marker>
             <filter id="nodeShadow" x="-10%" y="-10%" width="130%" height="130%">
-              <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.6"/>
+              <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
             </filter>
           </defs>
 
-          <!-- SVG Viewport Layers -->
           <g id="svgViewport">
             <g id="svgEdgesLayer"></g>
             <g id="svgNodesLayer"></g>
@@ -357,25 +266,25 @@
       </div>
 
       <!-- Standard Legend Guide -->
-      <div class="absolute bottom-3 left-3 bg-slate-900/90 border border-slate-800 backdrop-blur rounded-xl p-2.5 text-[11px] text-slate-300 shadow-2xl hidden sm:flex items-center gap-3 z-10">
-        <div class="flex items-center gap-1.5">
-          <span class="w-3.5 h-3.5 rounded-full bg-emerald-500/30 border border-emerald-400"></span> Bắt đầu / Kết thúc
+      <div class="absolute bottom-4 left-4 bg-slate-900/95 border border-slate-700 backdrop-blur-md rounded-xl p-3 text-[11px] text-slate-300 shadow-2xl hidden sm:flex items-center gap-4 z-10 pointer-events-none">
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-full bg-emerald-500/30 border-2 border-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.4)]"></span> Bắt đầu / Kết thúc
         </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3.5 h-2.5 bg-blue-500/30 border border-blue-400 transform -skew-x-12"></span> Nhập / Xuất (Input/Print)
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-3 bg-blue-500/30 border-2 border-blue-400 transform -skew-x-12 shadow-[0_0_5px_rgba(96,165,250,0.4)]"></span> Nhập / Xuất
         </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 bg-indigo-500/30 border border-indigo-400 rotate-45"></span> Điều kiện (If / Loop)
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 bg-indigo-500/30 border-2 border-indigo-400 rotate-45 shadow-[0_0_5px_rgba(129,140,248,0.4)]"></span> Điều kiện
         </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3.5 h-2.5 bg-slate-800 border border-slate-400"></span> Phép toán / Gán
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-3 bg-slate-800 border-2 border-slate-400"></span> Xử lý
         </div>
       </div>
 
       <!-- Floating Simulation Control Button -->
-      <div id="floatingSimControls" class="absolute bottom-4 right-4 z-20 flex gap-2">
-        <button id="btnFloatingSim" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-900/50 backdrop-blur transition border border-emerald-400/30" title="Chạy lại mô phỏng sử dụng lại các giá trị biến đã nhập trước đó">
-          <i class="fa-solid fa-rotate-right"></i> Chạy lại (Dữ liệu cũ)
+      <div id="floatingSimControls" class="absolute bottom-5 right-5 z-20 flex gap-2">
+        <button id="btnFloatingSim" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[13px] font-bold flex items-center gap-2 shadow-lg shadow-emerald-900/50 backdrop-blur-sm transition-all border border-emerald-400/30 hover:scale-105" title="Chạy lại mô phỏng sử dụng lại các giá trị biến đã nhập trước đó">
+          <i class="fa-solid fa-rotate-right"></i> Dùng lại Data cũ
         </button>
       </div>
 
@@ -385,22 +294,25 @@
 
   <!-- Interactive Prompt Modal for Python input() Execution -->
   <div id="inputModal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
       <div class="flex items-center space-x-3 text-cyan-400">
-        <div class="p-2 bg-cyan-950 border border-cyan-800 rounded-lg">
+        <div class="p-2.5 bg-cyan-950 border border-cyan-800 rounded-xl shadow-inner">
           <i class="fa-solid fa-terminal text-xl"></i>
         </div>
-        <h3 class="text-base font-bold text-white">Yêu Cầu Nhập Dữ Liệu input()</h3>
+        <h3 class="text-lg font-bold text-white tracking-wide">Nhập Dữ Liệu Input</h3>
       </div>
-      <p id="inputModalPrompt" class="text-xs text-slate-300 font-mono bg-slate-950 p-3 rounded-lg border border-slate-800 leading-relaxed">
+      
+      <p id="inputModalPrompt" class="text-[13px] text-slate-300 font-mono bg-[#090d16] p-4 rounded-xl border border-slate-800/80 leading-relaxed shadow-inner">
         Nhập giá trị cho biến:
       </p>
+      
       <div>
-        <label for="modalInputValue" class="block text-xs font-semibold text-slate-400 mb-1.5">Giá trị nhập vào:</label>
-        <input type="text" id="modalInputValue" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 font-mono" placeholder="Nhập giá trị số hoặc chuỗi..." autofocus>
+        <label for="modalInputValue" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Giá trị truyền vào:</label>
+        <input type="text" id="modalInputValue" class="w-full bg-[#020617] border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none transition-shadow font-mono shadow-inner" placeholder="Nhập giá trị..." autofocus>
       </div>
-      <div class="flex justify-end space-x-2 pt-2">
-        <button id="btnSubmitInput" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+      
+      <div class="flex justify-end pt-2">
+        <button id="btnSubmitInput" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/50 hover:shadow-blue-500/30">
           Xác nhận <i class="fa-solid fa-check"></i>
         </button>
       </div>
